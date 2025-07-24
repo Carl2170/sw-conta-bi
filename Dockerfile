@@ -16,4 +16,4 @@ RUN pip install --upgrade pip \
 EXPOSE 5000
 
 # 6. Ejecutar la aplicación
-CMD ["python", "app.py"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
