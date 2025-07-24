@@ -4,6 +4,8 @@ import numpy as np
 from datetime import datetime
 from joblib import load
 from gql import gql
+from gql.transport.requests import RequestsHTTPTransport
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 app = Flask(__name__)
 client = GraphQLClient()
@@ -100,11 +102,20 @@ def get_kpis():
 
     
     data_cuentas = client.execute(QUERY_CUENTAS)["accountingAccounts"]
+    def obtener_saldo(cuenta):
+            try:
+                saldo_data = client.execute(QUERY_SALDO_CUENTA, variables={"accountId": cuenta["id"]})
+                saldo = float(saldo_data["accountBalance"]["balance"])
+                return cuenta["name"], saldo
+            except Exception:
+                return cuenta["name"], 0.0
+
     cuentas_saldo = {}
-    for c in data_cuentas:
-        saldo_data = client.execute(QUERY_SALDO_CUENTA, variables={"accountId": c["id"]})
-        saldo = float(saldo_data["accountBalance"]["balance"])
-        cuentas_saldo[c["name"]] = saldo
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        futures = [executor.submit(obtener_saldo, c) for c in data_cuentas]
+        for future in as_completed(futures):
+            nombre, saldo = future.result()
+            cuentas_saldo[nombre] = saldo
 
     # Top 5
     cuentas_top = dict(sorted(cuentas_saldo.items(), key=lambda item: abs(item[1]), reverse=True)[:5])
