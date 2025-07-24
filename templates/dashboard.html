@@ -1,217 +1,218 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Dashboard Inteligencia de Negocio</title>
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <style>
-        :root {
-            --color-bg: #f4f6f9;
-            --color-card: #ffffff;
-            --color-acento: #3f8efc;
-            --color-borde: #dee2e6;
-            --font-color: #333333;
-        }
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard Inteligencia de Negocio</title>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <style>
+    :root {
+      --color-bg: #f4f6f9;
+      --color-card: #ffffff;
+      --color-acento: #3f8efc;
+      --color-borde: #dee2e6;
+      --font-color: #333333;
+    }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--color-bg);
-            color: var(--font-color);
-            margin: 20px;
-        }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--color-bg);
+      color: var(--font-color);
+      margin: 20px;
+    }
 
-        h1 {
-            text-align: center;
-            margin-bottom: 40px;
-            color: var(--color-acento);
-        }
+    h1 {
+      text-align: center;
+      margin-bottom: 40px;
+      color: var(--color-acento);
+    }
 
-        .cards {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 40px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
+    .cards {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
 
-        .card {
-            background: var(--color-card);
-            border: 1px solid var(--color-borde);
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.06);
-            padding: 25px;
-            text-align: center;
-            width: 220px;
-            transition: transform 0.2s ease;
-        }
+    .card {
+      background: var(--color-card);
+      border: 1px solid var(--color-borde);
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+      padding: 25px;
+      text-align: center;
+      width: 220px;
+      transition: transform 0.2s ease;
+    }
 
-        .card:hover {
-            transform: translateY(-4px);
-        }
+    .card:hover {
+      transform: translateY(-4px);
+    }
 
-        .card h3 {
-            margin-bottom: 10px;
-            font-size: 1.1rem;
-            color: var(--color-acento);
-        }
+    .card h3 {
+      margin-bottom: 10px;
+      font-size: 1.1rem;
+      color: var(--color-acento);
+    }
 
-        .card p {
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin: 0;
-        }
+    .card p {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin: 0;
+    }
 
-        #charts {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-            gap: 40px;
-            margin-bottom: 40px;
-        }
+    #charts {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+      gap: 40px;
+      margin-bottom: 40px;
+    }
 
-        #charts h3 {
-            text-align: center;
-            margin-bottom: 10px;
-            color: var(--color-acento);
-        }
+    #charts h3 {
+      text-align: center;
+      margin-bottom: 10px;
+      color: var(--color-acento);
+    }
 
-        #overdueCustomers {
-            background: #ffecec;
-            border-left: 6px solid #e74c3c;
-            padding: 20px;
-            border-radius: 8px;
-            max-width: 650px;
-            margin: 0 auto 50px;
-        }
+    #overdueCustomers {
+      background: #ffecec;
+      border-left: 6px solid #e74c3c;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 650px;
+      margin: 0 auto 50px;
+    }
 
-        #overdueCustomers h3 {
-            margin-bottom: 10px;
-            color: #c0392b;
-        }
+    #overdueCustomers h3 {
+      margin-bottom: 10px;
+      color: #c0392b;
+    }
 
-        #riesgoClientesChart {
-            margin-top: 40px;
-        }
+    #riesgoClientesChart {
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Dashboard Inteligencia de Negocio</h1>
 
-    </style>
-  </head>
-  <body>
-    <h1>Dashboard Inteligencia de Negocio</h1>
-
-    <!-- KPI cards -->
-    <div class="cards">
-      <div class="card">
-        <h3>Total Clientes Activos</h3>
-        <p>{{ total_clients }}</p>
-      </div>
-      <div class="card">
-        <h3>Clientes con Facturas Vencidas</h3>
-        <p>{{ overdue_customers | length }}</p>
-      </div>
+  <div class="cards">
+    <div class="card">
+      <h3>Total Clientes Activos</h3>
+      <p id="totalClientes">...</p>
     </div>
-
-    <div id="charts">
-      <!-- Facturas por estado (barra) -->
-      <div>
-        <h3>Facturas por Estado</h3>
-        <div id="invoicesStatusChart"></div>
-      </div>
-
-      <!-- Facturación por periodo (barra) -->
-      <div>
-        <h3>Facturación Total por Período</h3>
-        <div id="invoicesByPeriodChart"></div>
-      </div>
-
-      <!-- Pagos por método (torta) -->
-      <div>
-        <h3>Pagos por Método</h3>
-        <div id="paymentsByMethodChart"></div>
-      </div>
-
-      <div>
-        <h3>Top 5 Cuentas por Saldo</h3>
-        <div id="topAccountsChart"></div>
-      </div>
-    </div>
-
-    <!-- Lista clientes vencidos -->
-    <div id="overdueCustomers">
+    <div class="card">
       <h3>Clientes con Facturas Vencidas</h3>
-      <ul>
-        {% for cliente in overdue_customers %}
-        <li>{{ cliente }}</li>
-        {% else %}
-        <li>No hay clientes con facturas vencidas</li>
-        {% endfor %}
-      </ul>
+      <p id="totalVencidos">...</p>
+    </div>
+  </div>
+
+  <div id="charts">
+    <div>
+      <h3>Facturas por Estado</h3>
+      <div id="invoicesStatusChart"></div>
     </div>
 
     <div>
-      <h3>Clientes con Mayor Riesgo de Morosidad</h3>
-      <div id="riesgoClientesChart"></div>
+      <h3>Facturación Total por Período</h3>
+      <div id="invoicesByPeriodChart"></div>
     </div>
 
-    <script>
-          // Datos inyectados desde Flask
-          const invoicesStatus = {{ invoices_status | tojson }};
-          const invoicesByPeriod = {{ invoices_by_period | tojson }};
-          const paymentsByMethod = {{ payments_by_method | tojson }};
+    <div>
+      <h3>Pagos por Método</h3>
+      <div id="paymentsByMethodChart"></div>
+    </div>
 
-          // --- Facturas por estado (barras) ---
-          const estados = Object.keys(invoicesStatus);
-          const conteos = Object.values(invoicesStatus);
+    <div>
+      <h3>Top 5 Cuentas por Saldo</h3>
+      <div id="topAccountsChart"></div>
+    </div>
+  </div>
 
-          Plotly.newPlot('invoicesStatusChart', [{
-              x: estados,
-              y: conteos,
-              type: 'bar',
-              marker: { color: '#4C72B0' }
-          }], {
-              margin: { t: 30 },
-              yaxis: { title: 'Número de facturas' }
-          });
+  <div id="overdueCustomers">
+    <h3>Clientes con Facturas Vencidas</h3>
+    <ul id="listaVencidos">
+      <li>Cargando...</li>
+    </ul>
+  </div>
 
-          // --- Facturación por período (barras) ---
-          const periodos = Object.keys(invoicesByPeriod);
-          const montos = Object.values(invoicesByPeriod);
+  <div>
+    <h3>Clientes con Mayor Riesgo de Morosidad</h3>
+    <div id="riesgoClientesChart"></div>
+  </div>
 
-          Plotly.newPlot('invoicesByPeriodChart', [{
-              x: periodos,
-              y: montos,
-              type: 'bar',
-              marker: { color: '#55A868' }
-          }], {
-              margin: { t: 30 },
-              yaxis: { title: 'Monto facturado ($)' }
-          });
+  <script>
+    fetch("/api/total_clientes")
+      .then(res => res.json())
+      .then(total => {
+        document.getElementById("totalClientes").textContent = total;
+      });
 
-          // --- Pagos por método (torta) ---
-          const metodos = Object.keys(paymentsByMethod);
-          const pagosMontos = Object.values(paymentsByMethod);
+    fetch("/api/clientes_vencidos")
+      .then(res => res.json())
+      .then(clientes => {
+        document.getElementById("totalVencidos").textContent = clientes.length;
+        const lista = document.getElementById("listaVencidos");
+        lista.innerHTML = clientes.length
+          ? clientes.map(c => `<li>${c}</li>`).join("")
+          : "<li>No hay clientes con facturas vencidas</li>";
+      });
 
-          Plotly.newPlot('paymentsByMethodChart', [{
-              labels: metodos,
-              values: pagosMontos,
-              type: 'pie',
-              textinfo: 'label+percent',
-              insidetextorientation: 'radial'
-          }], {
-              margin: { t: 30 }
-          });
+    fetch("/api/facturas_estado")
+      .then(res => res.json())
+      .then(data => {
+        Plotly.newPlot('invoicesStatusChart', [{
+          x: Object.keys(data),
+          y: Object.values(data),
+          type: 'bar',
+          marker: { color: '#4C72B0' }
+        }], {
+          margin: { t: 30 },
+          yaxis: { title: 'Número de facturas' }
+        });
+      });
 
-          const topBalances = {{ top_account_balances | tojson }};
-          Plotly.newPlot('topAccountsChart', [{
-              x: Object.keys(topBalances),
-              y: Object.values(topBalances),
-              type: 'bar',
-              marker: { color: '#C44E52' }
-          }], {
-              margin: { t: 30 },
-              yaxis: { title: 'Saldo ($)' }
-          });
+    fetch("/api/facturacion_periodos")
+      .then(res => res.json())
+      .then(data => {
+        Plotly.newPlot('invoicesByPeriodChart', [{
+          x: Object.keys(data),
+          y: Object.values(data),
+          type: 'bar',
+          marker: { color: '#55A868' }
+        }], {
+          margin: { t: 30 },
+          yaxis: { title: 'Monto facturado ($)' }
+        });
+      });
 
+    fetch("/api/pagos_metodo")
+      .then(res => res.json())
+      .then(data => {
+        Plotly.newPlot('paymentsByMethodChart', [{
+          labels: Object.keys(data),
+          values: Object.values(data),
+          type: 'pie',
+          textinfo: 'label+percent',
+          insidetextorientation: 'radial'
+        }], { margin: { t: 30 } });
+      });
 
-        fetch("/api/prediccion_riesgo")
+    fetch("/api/top_saldos")
+      .then(res => res.json())
+      .then(data => {
+        Plotly.newPlot('topAccountsChart', [{
+          x: Object.keys(data),
+          y: Object.values(data),
+          type: 'bar',
+          marker: { color: '#C44E52' }
+        }], {
+          margin: { t: 30 },
+          yaxis: { title: 'Saldo ($)' }
+        });
+      });
+
+    fetch("/api/prediccion_riesgo")
       .then(resp => resp.json())
       .then(data => {
         const nombres = data.map(c => c.name);
@@ -227,6 +228,6 @@
           yaxis: { title: 'Probabilidad de atraso (%)', tickformat: ".0%" }
         });
       });
-    </script>
-  </body>
+  </script>
+</body>
 </html>
